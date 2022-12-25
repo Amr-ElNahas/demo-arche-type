@@ -52,12 +52,12 @@
     </properties>
 
     <scm>
-        <url>http://git.sumerge.com/momra-inspections/momra-template</url>
+        <url>http://git.sumerge.com/Inma/demo-template</url>
     </scm>
 
     <issueManagement>
         <system>RTC</system>
-        <url>https://jts.sumerge.com/ccm/web/projects/MCI%20(Change%20Management)</url>
+        <url>https://jts.sumerge.com/ccm/web/projects/Inma%20(Change%20Management)</url>
     </issueManagement>
 
     <repositories>

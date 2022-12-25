@@ -11,7 +11,7 @@ import javax.persistence.Table;
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table
-public class UserDocument {
+public class UserEntity {
 
     @Id
     private Long id;

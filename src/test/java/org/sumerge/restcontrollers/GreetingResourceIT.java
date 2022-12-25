@@ -2,7 +2,7 @@ package org.sumerge.restcontrollers;
 
 import org.sumerge.AbstractIT;
 import org.sumerge.repositories.UserRepository;
-import org.sumerge.models.UserDocument;
+import org.sumerge.models.UserEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class GreetingResourceIT extends AbstractIT {
         await().atMost(2, SECONDS).until(() ->
                 userRepository.findAll().size() > 0);
 
-        List<UserDocument> userList =  userRepository.findAll();
+        List<UserEntity> userList =  userRepository.findAll();
 
         Assertions.assertTrue(userList.size() == 1 && userList.get(0).getName().equals("Ahmed Yousry"));
     }

@@ -1,7 +1,7 @@
 package org.sumerge.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.sumerge.models.UserDocument;
+import org.sumerge.models.UserEntity;
 
-public interface UserRepository extends JpaRepository<UserDocument, Long> {
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
 }
