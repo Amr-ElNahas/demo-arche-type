@@ -2,16 +2,18 @@ package org.sumerge.models;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Document("users")
+@Entity
+@Table
 public class UserDocument {
 
     @Id
-    private ObjectId id;
+    private Long id;
     private String name;
 }

@@ -16,6 +16,7 @@ pipeline {
         choice(name: 'DOCKER_REGISTRY', choices: ['registry.sumerge.local'], description: 'Docker registry')
         booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Do you want to skip tests and sonarqube?')
         choice(name: 'SONAR', choices: ['http://sonarqube-temp.sumerge.local'], description: 'SonarQube host url')
+        choice(name: 'ENVIRONMENT', choices: ['testing', 'staging', 'production'], description: 'JKube Environment')
     }
 
     options {
@@ -26,19 +27,19 @@ pipeline {
     stages {
         stage('Clean') {
             steps {
-                sh 'mvn clean post-clean -Dbuild.number=${BUILD_NUMBER}'
+                sh 'mvn clean post-clean -Djkube.environment=${ENVIRONMENT}  -Dbuild.number=${BUILD_NUMBER}'
             }
         }
 
         stage('Unit tests') {
             steps {
-                sh 'mvn test -Dmaven.test.skip=${SKIP_TESTS} -Dbuild.number=${BUILD_NUMBER} -Dspring.profiles.active=kubernetes'
+                sh 'mvn test -Dmaven.test.skip=${SKIP_TESTS} -Dbuild.number=${BUILD_NUMBER} -Djkube.environment=${ENVIRONMENT} -Dspring.profiles.active=openshift'
             }
         }
 
         stage('Integration tests') {
             steps {
-                sh 'mvn integration-test verify -Dskip.surefire.tests -Dmaven.test.skip=${SKIP_TESTS} -Dbuild.number=${BUILD_NUMBER} -Dspring.profiles.active=kubernetes'
+                sh 'mvn integration-test verify -Dskip.surefire.tests -Dmaven.test.skip=${SKIP_TESTS} -Dbuild.number=${BUILD_NUMBER} -Djkube.environment=${ENVIRONMENT}  -Dspring.profiles.active=openshift'
             }
         }
 
@@ -48,7 +49,7 @@ pipeline {
                     if (params.SKIP_TESTS) {
                         echo "Test skip $SKIP_TESTS, so no SonarQube"
                     } else {
-                        sh 'mvn sonar:sonar -Dsonar.host.url=${SONAR} -Dbuild.number=${BUILD_NUMBER} -Dspring.profiles.active=kubernetes'
+                        sh 'mvn sonar:sonar -Dsonar.host.url=${SONAR} -Dbuild.number=${BUILD_NUMBER} -Djkube.environment=${ENVIRONMENT}  -Dspring.profiles.active=openshift'
                     }
                 }
             }
@@ -56,19 +57,15 @@ pipeline {
 
         stage('Docker') {
             steps {
-                sh 'mvn compile jib:build -Ddocker.registry=${DOCKER_REGISTRY} -Dk8s.namespace=${NAMESPACE} -Dbuild.number=${BUILD_NUMBER} -Dspring.profiles.active=kubernetes'
+                sh 'mvn compile jib:build -Ddocker.registry=${DOCKER_REGISTRY} -Dk8s.namespace=${NAMESPACE} -Dbuild.number=${BUILD_NUMBER} -Djkube.environment=${ENVIRONMENT}  -Dspring.profiles.active=openshift'
             }
         }
 
         stage('K8s deploy') {
             steps {
                 sh """
-        sed -i "s|@DOCKER_REGISTRY@|${DOCKER_REGISTRY}|g" $WORKSPACE/kubernetes-db.yml
-        sed -i "s|@NAMESPACE@|${NAMESPACE}|g" $WORKSPACE/kubernetes-db.yml
-        mvn k8s:resource -Ddocker.registry=${DOCKER_REGISTRY} -Dhost=${HOST} -Dk8s.namespace=${NAMESPACE} -Dbuild.number=${BUILD_NUMBER} -Dspring.profiles.active=kubernetes
+        mvn k8s:resource -Ddocker.registry=${DOCKER_REGISTRY} -Dhost=${HOST} -Dk8s.namespace=${NAMESPACE} -Dbuild.number=${BUILD_NUMBER} -Djkube.environment=${ENVIRONMENT}  -Dspring.profiles.active=kubernetes
         kubectl apply -f $WORKSPACE/target/classes/META-INF/jkube/kubernetes.yml -n ${NAMESPACE}
-        kubectl apply -f $WORKSPACE/kubernetes-db.yml -n ${NAMESPACE}
-        kubectl apply -f $WORKSPACE/springboot-sa.yml -n ${NAMESPACE}
         """
             }
         }

@@ -1,8 +1,8 @@
 package org.sumerge.services;
 
+import org.springframework.stereotype.Component;
 import org.sumerge.models.UserDocument;
 import org.sumerge.models.UserModel;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;

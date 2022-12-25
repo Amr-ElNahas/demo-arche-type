@@ -6,17 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.sumerge.models.UserEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.listener.MessageListenerContainer;
-import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -33,7 +27,6 @@ import static org.sumerge.common.Constants.USER_TEST_TOPIC;
 @SpringBootTest
 @DirtiesContext
 @EnableAutoConfiguration
-@EmbeddedKafka(partitions = 1, topics = {USER_TEST_TOPIC})
 public abstract class AbstractIT {
 
     protected MockMvc mvc;
@@ -41,17 +34,9 @@ public abstract class AbstractIT {
     @Autowired
     WebApplicationContext webApplicationContext;
 
-    @Autowired
-    protected KafkaTemplate<String, UserEvent> template;
-
-    @Autowired
-    protected KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
     @BeforeEach
     public void setUp() {
-        for (MessageListenerContainer listenerContainer : kafkaListenerEndpointRegistry.getListenerContainers()) {
-            ContainerTestUtils.waitForAssignment(listenerContainer, 1);
-        }
 
         mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }

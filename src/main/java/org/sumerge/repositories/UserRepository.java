@@ -1,8 +1,7 @@
 package org.sumerge.repositories;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.sumerge.models.UserDocument;
-import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface UserRepository extends MongoRepository<UserDocument, ObjectId> {
+public interface UserRepository extends JpaRepository<UserDocument, Long> {
 }
